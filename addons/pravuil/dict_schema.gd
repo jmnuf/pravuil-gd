@@ -20,8 +20,7 @@ func parse(value, main_type_err_message: String = "", sub_type_err_message: Stri
 	if sub_type_err_message.empty():
 		sub_type_err_message = "Expected {expected} but got {received}"
 	
-	var dict: Dictionary = value
-	var val_keys = dict.keys()
+	var val_keys = value.keys()
 	var shape_keys = _shape.keys()
 	for k in val_keys:
 		if shape_keys.has(k):
@@ -38,7 +37,7 @@ func parse(value, main_type_err_message: String = "", sub_type_err_message: Stri
 			result = Result.new(false, "Shape mismatch: Passed element has extra key `%s`" % str(k))
 			return result
 	
-	var val := {}
+	var val := {} if _exact else value
 	for k in shape_keys:
 		var sub_value = value[k]
 		var schema = _shape[k]
