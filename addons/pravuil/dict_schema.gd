@@ -22,16 +22,16 @@ func parse(value, main_type_err_message: String = "", sub_type_err_message: Stri
 	
 	var val_keys = value.keys()
 	var shape_keys = _shape.keys()
-	for k in val_keys:
-		if shape_keys.has(k):
+	for k in shape_keys:
+		if val_keys.has(k):
 			continue
 		
 		result = Result.new(false, "Shape mismatch: Passed element is missing key `%s`" % str(k))
 		return result
 	
 	if _exact:
-		for k in shape_keys:
-			if val_keys.has(k):
+		for k in val_keys:
+			if shape_keys.has(k):
 				continue
 			
 			result = Result.new(false, "Shape mismatch: Passed element has extra key `%s`" % str(k))

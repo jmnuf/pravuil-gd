@@ -23,6 +23,10 @@ _global_script_class_icons={
 config/name="Pravuil"
 config/icon="res://icon.png"
 
+[autoload]
+
+Prav="*res://addons/pravuil/pravuil.gd"
+
 [editor_plugins]
 
 enabled=PoolStringArray( "res://addons/godot-plugin-refresher/plugin.cfg", "res://addons/pravuil/plugin.cfg" )
