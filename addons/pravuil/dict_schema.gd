@@ -12,7 +12,7 @@ func _init(shape: Dictionary, exact: bool = false, nullable: bool = false).(TYPE
 	_exact = exact
 
 
-func parse(value, main_type_err_message: String = "", sub_type_err_message: String = "") -> Result:
+func parse(value, main_type_err_message: String = "", sub_type_err_message: String = "") -> SchemaResult:
 	var result := .parse(value, main_type_err_message)
 	if not result.ok:
 		return result
@@ -26,7 +26,7 @@ func parse(value, main_type_err_message: String = "", sub_type_err_message: Stri
 		if val_keys.has(k):
 			continue
 		
-		result = Result.new(false, "Shape mismatch: Passed element is missing key `%s`" % str(k))
+		result = SchemaResult.Err("Shape mismatch: Passed element is missing key `%s`" % str(k))
 		return result
 	
 	if _exact:
@@ -34,7 +34,7 @@ func parse(value, main_type_err_message: String = "", sub_type_err_message: Stri
 			if shape_keys.has(k):
 				continue
 			
-			result = Result.new(false, "Shape mismatch: Passed element has extra key `%s`" % str(k))
+			result = SchemaResult.Err("Shape mismatch: Passed element has extra key `%s`" % str(k))
 			return result
 	
 	var val := {} if _exact else value
@@ -48,6 +48,6 @@ func parse(value, main_type_err_message: String = "", sub_type_err_message: Stri
 			continue
 		
 		var err_message = "Invalid element type at key %s: %s" % [str(k), result.value]
-		return Result.new(false, err_message)
+		return SchemaResult.Err(err_message)
 	
-	return Result.new(true, val)
+	return SchemaResult.Ok(val)

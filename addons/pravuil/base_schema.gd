@@ -42,10 +42,10 @@ func _init(type: int, nullable: bool = false) -> void:
 	_nullable = nullable
 
 
-func parse(value, err_message: String = "") -> Result:
+func parse(value, err_message: String = "") -> SchemaResult:
 	var value_type = typeof(value)
 	if value_type == _type :
-		return Result.new(true, value)
+		return SchemaResult.Ok(value)
 	
 	if err_message.empty():
 		err_message = "Invalid type: Expected {expected} but got {received}"
@@ -55,10 +55,10 @@ func parse(value, err_message: String = "") -> Result:
 		"received": TYPES[value_type]
 	})
 	
-	return Result.new(false, err_message)
+	return SchemaResult.Err(err_message)
 
 
-class Result extends Reference:
+class SchemaResult extends Reference:
 	var ok: bool
 	var value
 	
@@ -76,3 +76,9 @@ class Result extends Reference:
 			return ""
 		
 		return value
+	
+	static func Ok(val) -> SchemaResult:
+		return SchemaResult.new(true, val)
+	
+	static func Err(err : String) -> SchemaResult:
+		return SchemaResult.new(false, err)
