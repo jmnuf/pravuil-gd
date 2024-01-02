@@ -1,20 +1,28 @@
 extends Node2D
 
-var schema := Prav.dict({
-	"name": Prav.string(),
-	"age": Prav.int(),
-	"addr": Prav.dict({
-		"number": Prav.int(),
-		"street": Prav.string(),
-	})
-}, true)
 
 func _ready() -> void:
 	_test_dictionary()
+	
 	_test_literal()
+	
+	_test_map()
+	
+	get_tree().quit(0)
 
 
 func _test_dictionary() -> void:
+	_header("Dict<{ SHAPE }>")
+	
+	var schema := Prav.dict({
+		"name": Prav.string(),
+		"age": Prav.int(),
+		"addr": Prav.dict({
+			"number": Prav.int(),
+			"street": Prav.string(),
+		})
+	}, true)
+	
 	var result := schema.parse({
 		"name": "John",
 		"age": 23,
@@ -36,6 +44,8 @@ func _test_dictionary() -> void:
 
 
 func _test_literal() -> void:
+	_header("Literal<T>")
+	
 	var number_two := Prav.literal(2)
 	var result := number_two.parse(1)
 	# False, same type but different values
@@ -68,3 +78,21 @@ func _test_literal() -> void:
 	prints(alts.parse(69))
 	
 	prints(alts)
+
+
+func _test_map() -> void:
+	_header("MAP<K, V>")
+	var map := Prav.map(Prav.string(), Prav.number())
+	
+	# { ok: false }
+	prints(map.parse({ "A": "John", "B": "Tsoding" }))
+	# { ok: false }
+	prints(map.parse({ 0: "Zero", 1: "One" }))
+	# { ok: true }
+	prints(map.parse({ "One": 1, "Two": 2 }))
+	# { ok: true }
+	prints(map.parse({}))
+
+
+func _header(hname: String) -> void:
+	print("\n========== %s ==========" % hname)
