@@ -74,9 +74,10 @@ func _compare_dictionaries(base : Dictionary, other : Dictionary, suffix : Strin
 	var base_keys = base.keys()
 	var other_keys = other.keys()
 	for key in base_keys:
+		var sub_suffix:String = "%s.%s" % [suffix, str(key)]
 		if not (key in other_keys):
 			return SchemaResult.Err("MissingKey:{SUFFIX}Inputted Dictionary is missing key {KEY}".format({
-				"SUFFIX": _get_suffix(suffix),
+				"SUFFIX": _get_suffix(sub_suffix),
 				"KEY": key
 			}))
 		
@@ -94,16 +95,15 @@ func _compare_dictionaries(base : Dictionary, other : Dictionary, suffix : Strin
 		
 		if bvt <= TYPE_RID:
 			if base_val == other_val:
-				return SchemaResult.Ok(other_val)
+				continue
 			else:
 				return SchemaResult.Err("Invalid value:{SUFFIX}For key {KEY} expected literal value {EXP_VAL} but got {GOT_VAL}".format({
-					"SUFFIX": _get_suffix(suffix),
+					"SUFFIX": _get_suffix(sub_suffix),
 					"KEY": key,
 					"EXP_VAL": base_val,
 					"GOT_VAL": other_val,
 				}))
 		
-		var sub_suffix:String = "%s.%s" % [suffix, str(key)]
 		match bvt:
 			TYPE_DICTIONARY:
 				var res := _compare_dictionaries(base_val, other_val, sub_suffix)
@@ -165,7 +165,7 @@ func _compare_arrays(base: Array, other : Array, suffix : String = "") -> Schema
 		
 		if bvt <= TYPE_RID:
 			if base_val == other_val:
-				return SchemaResult.Ok(other_val)
+				continue
 			else:
 				return SchemaResult.Err("Invalid value:{SUFFIX}At index {IDX} expected literal value {EXP_VAL} but got {GOT_VAL}".format({
 					"SUFFIX": _get_suffix(suffix),
