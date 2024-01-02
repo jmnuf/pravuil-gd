@@ -33,6 +33,7 @@ const TYPES := {
 
 var _type: int
 var _nullable: bool
+var _or_schema : Schema
 
 func _init(type: int, nullable: bool = false) -> void:
 	# Make sure the type is not null and it's not beyond the types enum (ignore special types)
@@ -40,9 +41,38 @@ func _init(type: int, nullable: bool = false) -> void:
 	_type = type
 	
 	_nullable = nullable
+	
+	_or_schema = null
 
 
 func parse(value, err_message: String = "") -> SchemaResult:
+	var value_type = typeof(value)
+	
+	if value_type == _type :
+		return _parse(value, err_message)
+	
+	if _or_schema and value_type == _or_schema._type:
+		return _or_schema._parse(value, err_message)
+	
+	var res := _parse(value, err_message)
+	
+	if not res.ok and _or_schema:
+		var or_res := _or_schema.parse(value)
+		if or_res.ok:
+			return or_res
+	
+	if err_message.empty():
+		err_message = "Invalid type: Expected {expected} but got {received}"
+	
+	err_message = err_message.format({
+		"expected": get_valid_types().join(" or "),
+		"received": TYPES[value_type]
+	})
+	
+	return SchemaResult.Err(err_message)
+
+
+func _parse(value, err_message: String = "") -> SchemaResult:
 	var value_type = typeof(value)
 	if value_type == _type :
 		return SchemaResult.Ok(value)
@@ -51,11 +81,47 @@ func parse(value, err_message: String = "") -> SchemaResult:
 		err_message = "Invalid type: Expected {expected} but got {received}"
 	
 	err_message = err_message.format({
-		"expected": TYPES[_type],
-		"received": TYPES[value_type]
+		"expected": get_type_name(),
+		"received": self.typeof(value_type)
 	})
 	
 	return SchemaResult.Err(err_message)
+
+
+func alt(schema : Schema) -> Schema:
+	if _or_schema:
+		_or_schema.alt(schema)
+	else:
+		_or_schema = schema
+	return self
+
+
+## Overrideable
+func get_type_name() -> String:
+	return TYPES.get(_type, "???")
+
+
+# final method, should not be changed
+func get_type() -> String:
+	return TYPES.get(_type, "???")
+
+
+func get_valid_types() -> PoolStringArray:
+	var type = get_type_name()
+	var types = PoolStringArray([type])
+	if not _or_schema:
+		return types
+	
+	types.append_array(_or_schema.get_valid_types())
+	return types
+
+
+func _to_string() -> String:
+	return "{ PravuilSchema@@<{id}>, \"base_type\": <{type}>, \"accepts\": <{valid}> }".format({
+		"id": get_instance_id(),
+		"type": JSON.print(get_type_name()),
+		"valid": JSON.print(get_valid_types())
+	}, "<{_}>")
 
 
 class SchemaResult extends Reference:

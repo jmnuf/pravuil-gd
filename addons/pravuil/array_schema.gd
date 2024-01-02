@@ -7,8 +7,8 @@ func _init(sub_schema: Schema, nullable: bool = false).(TYPE_ARRAY, nullable) ->
 	_sub_schema = sub_schema
 
 
-func parse(value, main_type_err_message: String = "", sub_type_err_message: String = "") -> SchemaResult:
-	var result := .parse(value, main_type_err_message)
+func _parse(value, main_type_err_message: String = "", sub_type_err_message: String = "") -> SchemaResult:
+	var result := ._parse(value, main_type_err_message)
 	if not result.ok:
 		return result
 	

@@ -6,12 +6,12 @@ func _init(val, nullable = false).(typeof(val)) -> void:
 	_value = val
 
 
-func parse(value, type_error_message: String = "") -> SchemaResult:
+func _parse(value, type_error_message: String = "") -> SchemaResult:
 	if type_error_message.empty():
 		# TODO: Probably error should say something different per type
 		type_error_message = "Invalid type: Expected literal value %s of type {expected} but got a {received}" % str(_value)
 	
-	var res := .parse(value, type_error_message)
+	var res := ._parse(value, type_error_message)
 	if not res.ok:
 		return res
 	
@@ -190,6 +190,10 @@ func _compare_arrays(base: Array, other : Array, suffix : String = "") -> Schema
 	
 	return SchemaResult.Ok(other)
 
+
+## @Override
+func get_type_name() -> String:
+	return "Literal<%s>" % TYPES.get(_type, "???")
 
 
 func _get_suffix(base:String) -> String:

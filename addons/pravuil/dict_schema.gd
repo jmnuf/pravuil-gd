@@ -12,8 +12,8 @@ func _init(shape: Dictionary, exact: bool = false, nullable: bool = false).(TYPE
 	_exact = exact
 
 
-func parse(value, main_type_err_message: String = "", sub_type_err_message: String = "") -> SchemaResult:
-	var result := .parse(value, main_type_err_message)
+func _parse(value, main_type_err_message: String = "", sub_type_err_message: String = "") -> SchemaResult:
+	var result := ._parse(value, main_type_err_message)
 	if not result.ok:
 		return result
 	
