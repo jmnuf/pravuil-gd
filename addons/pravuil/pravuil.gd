@@ -2,6 +2,7 @@ extends Node
 
 const DictSchema := preload("res://addons/pravuil/dict_schema.gd")
 const ArraySchema := preload("res://addons/pravuil/array_schema.gd")
+const LiteralSchema := preload("res://addons/pravuil/literal_schema.gd")
 
 
 func int(nullable: bool = false) -> Schema:
@@ -27,3 +28,6 @@ func array(type: Schema, nullable: bool = false) -> ArraySchema:
 func dict(shape: Dictionary, exact: bool = false, nullable: bool = false) -> DictSchema:
 	return DictSchema.new(shape, exact, nullable)
 
+
+func literal(value, nullable : bool = false) -> Schema:
+	return LiteralSchema.new(value, nullable)

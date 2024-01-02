@@ -9,6 +9,8 @@ var schema := Prav.dict({
 	})
 }, true)
 
+var number_two := Prav.literal(2)
+
 func _ready() -> void:
 	var result := schema.parse({
 		"name": "John",
@@ -28,3 +30,18 @@ func _ready() -> void:
 	
 	# False, error message
 	prints(result.ok, result.value)
+	
+	result = number_two.parse(1)
+	
+	# False, same type but different values
+	prints(result.ok, result.value)
+	
+	result = number_two.parse("Hello")
+	
+	# False, different types
+	prints(result.ok, result.value)
+	
+	result = number_two.parse(2)
+	
+	# True, integer 2
+	prints(result.ok, Schema.TYPES[typeof(result.value)], result.value)
