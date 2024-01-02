@@ -9,9 +9,11 @@ var schema := Prav.dict({
 	})
 }, true)
 
-var number_two := Prav.literal(2)
-
 func _ready() -> void:
+	_test_dictionary()
+	_test_literal()
+
+func _test_dictionary() -> void:
 	var result := schema.parse({
 		"name": "John",
 		"age": 23,
@@ -30,18 +32,24 @@ func _ready() -> void:
 	
 	# False, error message
 	prints(result.ok, result.value)
-	
-	result = number_two.parse(1)
-	
+
+
+func _test_literal() -> void:
+	var number_two := Prav.literal(2)
+	var result := number_two.parse(1)
 	# False, same type but different values
 	prints(result.ok, result.value)
-	
 	result = number_two.parse("Hello")
-	
 	# False, different types
 	prints(result.ok, result.value)
-	
 	result = number_two.parse(2)
-	
 	# True, integer 2
-	prints(result.ok, Schema.TYPES[typeof(result.value)], result.value)
+	prints(result.ok, Schema.typeof(result.value), result.value)
+	
+	var one_two_three := Prav.literal([1, 2, 3])
+	# { ok: false } type error, these are floats not integers
+	prints(one_two_three.parse([1.0, 2.0, 3.0]))
+	# { ok: false } array mismatch, lengths are not the same
+	prints(one_two_three.parse([3, 4]))
+	# { ok: true } same length and same values
+	prints(one_two_three.parse([1, 2, 3]))

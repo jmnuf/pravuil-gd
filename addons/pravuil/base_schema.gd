@@ -77,8 +77,25 @@ class SchemaResult extends Reference:
 		
 		return value
 	
+	func _to_string() -> String:
+		var id = get_instance_id()
+		return "{ SchemaResult@@%d, ok: %s, \"%s\": %s }" % [
+			id, "true" if ok else "false",
+			"value" if ok else "error",
+			JSON.print(value)
+		]
+	
+	func _get(property: String):
+		if property == "error" and not ok:
+			return value
+		return null
+	
 	static func Ok(val) -> SchemaResult:
 		return SchemaResult.new(true, val)
 	
 	static func Err(err : String) -> SchemaResult:
 		return SchemaResult.new(false, err)
+
+
+static func typeof(value) -> String:
+	return TYPES.get(typeof(value), "???")
