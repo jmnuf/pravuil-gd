@@ -46,20 +46,17 @@ func _init(type: int, nullable: bool = false) -> void:
 
 
 func parse(value, err_message: String = "") -> SchemaResult:
-	var value_type = typeof(value)
-	
-	if value_type == _type :
-		return _parse(value, err_message)
-	
-	if _or_schema and value_type == _or_schema._type:
-		return _or_schema._parse(value, err_message)
-	
 	var res := _parse(value, err_message)
 	
-	if not res.ok and _or_schema:
+	if res.ok:
+		return res
+	
+	if _or_schema:
 		var or_res := _or_schema.parse(value)
 		if or_res.ok:
 			return or_res
+	
+	var value_type = typeof(value)
 	
 	if err_message.empty():
 		err_message = "Invalid type: Expected {expected} but got {received}"

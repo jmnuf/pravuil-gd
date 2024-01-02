@@ -66,7 +66,9 @@ func _test_literal() -> void:
 	prints(one_two_three.parse([1, 2, 3]))
 	
 	var alts := Prav.literal({ "foo": 0, "bar": -1, "baz": "bbb" })\
-					.alt(Prav.literal(69))
+					.alt(Prav.literal(69))\
+					.alt(Prav.literal({ "Foo": PoolStringArray(["Hello", "World"]) }))\
+					.alt(Prav.literal(PoolColorArray([Color.rebeccapurple])))
 	
 	# { ok: false } "foo" is wrong
 	prints(alts.parse({ "foo": 1, "bar": -1, "baz": "bbb" }))
@@ -76,6 +78,10 @@ func _test_literal() -> void:
 	prints(alts.parse({ "foo": 0, "bar": -1, "baz": "aaa" }))
 	# { ok: true } alternative schema allows literal 69
 	prints(alts.parse(69))
+	# { ok: true }
+	prints(alts.parse({ "Foo": PoolStringArray(["Hello", "World"]), "Bar": "Baz" }))
+	# { ok: true }
+	prints(alts.parse(PoolColorArray([Color.rebeccapurple])))
 	
 	prints(alts)
 
