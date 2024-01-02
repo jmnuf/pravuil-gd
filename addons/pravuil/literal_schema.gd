@@ -37,33 +37,7 @@ func _parse(value, type_error_message: String = "") -> SchemaResult:
 	
 	var type_name:String = TYPES.get(_type, "???")
 	if type_name.begins_with("Pool") and type_name.ends_with("Array"):
-		var base_length:int = _value.size()
-		var othr_length:int = value.size()
-		if base_length < othr_length:
-			return SchemaResult.Err("Array Mismatch:{SUFFIX}Other array is too long, expected to {EXP} elements but found {GOT} elements".format({
-				"SUFFIX": _get_suffix("arr"),
-				"EXP": base_length,
-				"GOT": othr_length,
-			}))
-		elif base_length > othr_length:
-			return SchemaResult.Err("Array Mismatch:{SUFFIX}Other array is too short, expected to {EXP} elements but found {GOT} elements".format({
-				"SUFFIX": _get_suffix("arr"),
-				"EXP": base_length,
-				"GOT": othr_length,
-			}))
-		
-		for i in range(base_length):
-			var base_val = _value[i]
-			var other_val = value[i]
-			if base_val != other_val:
-				return SchemaResult.Err("Invalid value:{SUFFIX}At index {IDX} expected literal value {EXP_VAL} but got {GOT_VAL}".format({
-					"SUFFIX": _get_suffix("arr"),
-					"IDX": i,
-					"EXP_VAL": base_val,
-					"GOT_VAL": other_val,
-				}))
-		
-		return res
+		return _compare_pool_arrays(_value, value)
 	
 	push_warning("Unsupported type %s (%d) in literal value check is ignored" % [TYPES.get(_type), _type])
 	
@@ -85,6 +59,7 @@ func _compare_dictionaries(base : Dictionary, other : Dictionary, suffix : Strin
 		var other_val = other.get(key)
 		var bvt = typeof(base_val)
 		var ovt = typeof(other_val)
+		
 		if bvt != ovt:
 			return SchemaResult.Err("Invalid type:{SUFFIX}For key {KEY} expected {EXP_TYPE} but got {GOT_TYPE}".format({
 				"SUFFIX": _get_suffix(suffix),
@@ -117,6 +92,12 @@ func _compare_dictionaries(base : Dictionary, other : Dictionary, suffix : Strin
 				var res := _compare_arrays(base_val, other_val, sub_suffix)
 				if not res.ok:
 					return res
+		
+		var type_name:String = Schema.typeof(bvt)
+		if type_name.begins_with("Pool") and type_name.ends_with("Array"):
+			var res := _compare_pool_arrays(base, other)
+			if not res.ok:
+				return res
 	
 	return SchemaResult.Ok(other)
 
@@ -150,11 +131,13 @@ func _compare_arrays(base: Array, other : Array, suffix : String = "") -> Schema
 			"GOT": oal,
 		}))
 	
+	
 	for i in range(bal):
 		var base_val = base[i]
 		var other_val = other[i]
 		var bvt = typeof(base_val)
 		var ovt = typeof(other_val)
+		
 		if bvt != ovt:
 			return SchemaResult.Err("Invalid type:{SUFFIX}At index {IDX} expected {EXP_TYPE} but got {GOT_TYPE}".format({
 				"SUFFIX": _get_suffix(suffix),
@@ -187,6 +170,42 @@ func _compare_arrays(base: Array, other : Array, suffix : String = "") -> Schema
 				var res := _compare_arrays(base_val, other_val, "%s[%s]" % [suffix, str(i)])
 				if not res.ok:
 					return res
+		
+		var type_name:String = Schema.typeof(bvt)
+		if type_name.begins_with("Pool") and type_name.ends_with("Array"):
+			var res := _compare_pool_arrays(base, other)
+			if not res.ok:
+				return res
+	
+	return SchemaResult.Ok(other)
+
+
+func _compare_pool_arrays(base, other, suffix : String = "") -> SchemaResult:
+	var base_length:int = base.size()
+	var othr_length:int = other.size()
+	if base_length < othr_length:
+		return SchemaResult.Err("Array Mismatch:{SUFFIX}Other array is too long, expected to {EXP} elements but found {GOT} elements".format({
+			"SUFFIX": _get_suffix("arr"),
+			"EXP": base_length,
+			"GOT": othr_length,
+		}))
+	elif base_length > othr_length:
+		return SchemaResult.Err("Array Mismatch:{SUFFIX}Other array is too short, expected to {EXP} elements but found {GOT} elements".format({
+			"SUFFIX": _get_suffix("arr"),
+			"EXP": base_length,
+			"GOT": othr_length,
+		}))
+	
+	for i in range(base_length):
+		var base_val = base[i]
+		var other_val = other[i]
+		if base_val != other_val:
+			return SchemaResult.Err("Invalid value:{SUFFIX}At index {IDX} expected literal value {EXP_VAL} but got {GOT_VAL}".format({
+				"SUFFIX": _get_suffix("arr"),
+				"IDX": i,
+				"EXP_VAL": base_val,
+				"GOT_VAL": other_val,
+			}))
 	
 	return SchemaResult.Ok(other)
 
