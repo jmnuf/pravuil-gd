@@ -53,3 +53,11 @@ func _test_literal() -> void:
 	prints(one_two_three.parse([3, 4]))
 	# { ok: true } same length and same values
 	prints(one_two_three.parse([1, 2, 3]))
+	
+	var dict := Prav.literal({ "foo": 0, "bar": -1, "baz": "bbb" })
+	# { ok: false } "foo" is wrong
+	prints(dict.parse({ "foo": 1, "bar": -1, "baz": "bbb" }))
+	# { ok: false } "bar" is wrong
+	prints(dict.parse({ "foo": 0, "bar": 0, "baz": "bbb" }))
+	# { ok: false } "baz" is wrong
+	prints(dict.parse({ "foo": 0, "bar": -1, "baz": "aaa" }))
