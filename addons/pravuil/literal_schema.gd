@@ -92,7 +92,7 @@ func _compare_dictionaries(base : Dictionary, other : Dictionary, suffix : Strin
 				"GOT_TYPE": TYPES.get(ovt, "???"),
 			}))
 		
-		if _type <= TYPE_RID:
+		if bvt <= TYPE_RID:
 			if base_val == other_val:
 				return SchemaResult.Ok(other_val)
 			else:
@@ -104,7 +104,7 @@ func _compare_dictionaries(base : Dictionary, other : Dictionary, suffix : Strin
 				}))
 		
 		var sub_suffix:String = "%s.%s" % [suffix, str(key)]
-		match _type:
+		match bvt:
 			TYPE_DICTIONARY:
 				var res := _compare_dictionaries(base_val, other_val, sub_suffix)
 				if not res.ok:
@@ -138,13 +138,13 @@ func _compare_arrays(base: Array, other : Array, suffix : String = "") -> Schema
 	var oal := other.size()
 	
 	if bal < oal:
-		return SchemaResult.Err("Array Mismatch:{SUFFIX}Other array is too long, expected to {EXP} elements but found {GOT} elements".format({
+		return SchemaResult.Err("Array Mismatch:{SUFFIX}Other array is too long, expected to have {EXP} elements but found {GOT} elements".format({
 			"SUFFIX": _get_suffix(suffix),
 			"EXP": bal,
 			"GOT": oal,
 		}))
 	elif bal > oal:
-		return SchemaResult.Err("Array Mismatch:{SUFFIX}Other array is too short, expected to {EXP} elements but found {GOT} elements".format({
+		return SchemaResult.Err("Array Mismatch:{SUFFIX}Other array is too short, expected to have {EXP} elements but found {GOT} elements".format({
 			"SUFFIX": _get_suffix(suffix),
 			"EXP": bal,
 			"GOT": oal,
@@ -163,7 +163,7 @@ func _compare_arrays(base: Array, other : Array, suffix : String = "") -> Schema
 				"GOT_TYPE": TYPES.get(ovt, "???"),
 			}))
 		
-		if _type <= TYPE_RID:
+		if bvt <= TYPE_RID:
 			if base_val == other_val:
 				return SchemaResult.Ok(other_val)
 			else:
@@ -174,7 +174,7 @@ func _compare_arrays(base: Array, other : Array, suffix : String = "") -> Schema
 					"GOT_VAL": other_val,
 				}))
 		
-		match _type:
+		match bvt:
 			TYPE_DICTIONARY:
 				var res := _compare_dictionaries(base_val, other_val, "%s[%s]" % [suffix, str(i)])
 				if not res.ok:
