@@ -13,6 +13,7 @@ func _ready() -> void:
 	_test_dictionary()
 	_test_literal()
 
+
 func _test_dictionary() -> void:
 	var result := schema.parse({
 		"name": "John",

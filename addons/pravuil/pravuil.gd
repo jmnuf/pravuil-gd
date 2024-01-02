@@ -31,3 +31,4 @@ func dict(shape: Dictionary, exact: bool = false, nullable: bool = false) -> Dic
 
 func literal(value, nullable : bool = false) -> Schema:
 	return LiteralSchema.new(value, nullable)
+
